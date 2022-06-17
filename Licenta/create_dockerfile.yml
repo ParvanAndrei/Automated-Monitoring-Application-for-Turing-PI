@@ -1,0 +1,79 @@
+---
+  
+- name: Verify if path exist
+  stat:
+    path: "{{ sensor_name.value[ansible_host]['sensor_path'] }}"
+  register: path_output
+  ignore_errors: yes
+
+- name: Create Folder if it doesn't exist
+  file:
+    path: "{{ sensor_name.value[ansible_host]['sensor_path'] }}"
+    state: directory
+  when: not path_output.stat.exists
+
+- name: Verify if Dockerfile exist
+  stat:
+    path: "{{ sensor_name.value[ansible_host]['dockerfile_path'] }}"
+  register: path_output_dockerfile
+
+- name: Create an empty Dockerfile
+  file:
+    path: "{{ sensor_name.value[ansible_host]['dockerfile_path'] }}"
+    state: touch
+  register: file_status
+  when: not path_output_dockerfile.stat.exists
+
+- name: Copy script to machines
+  copy: 
+    src: "./{{ sensor_name.key }}/{{ sensor_name.key }}.py"
+    dest: "{{ sensor_name.value[ansible_host]['sensor_path'] }}" 
+  when: not path_output_dockerfile.stat.exists
+
+- name: Create Dockerfile if it doesn't exist - get image
+  lineinfile:
+    path: "{{ sensor_name.value[ansible_host]['dockerfile_path'] }}"
+    line: "{{ sensor_name.value[ansible_host]['get_image'] }}"
+  when: file_status is succeeded
+
+- name: Get copy_file length
+  set_fact: 
+    len_copy_files: "{{ sensor_name.value[ansible_host]['copy_files']|length }}"
+  ignore_errors: yes 
+
+- name: Create Dockerfile if it doesn't exist - copy content in container
+  lineinfile:
+    path: "{{ sensor_name.value[ansible_host]['dockerfile_path'] }}"
+    line: "{{ sensor_name.value[ansible_host]['copy_files'][copy_files_index] }}"
+  loop: "{{ range(0, len_copy_files | int)| list }}"
+  loop_control:
+    loop_var: copy_files_index
+  when: file_status is succeeded
+
+- name: Get install_dependencies length
+  set_fact: 
+    len_install_dependencies: "{{ sensor_name.value[ansible_host]['install_dependencies']|length }}"
+  ignore_errors: yes 
+
+- name: Create Dockerfile if it doesn't exist - install dependencies
+  lineinfile:
+    path: "{{ sensor_name.value[ansible_host]['dockerfile_path'] }}"
+    line: "{{ sensor_name.value[ansible_host]['install_dependencies'][install_dependencies_index] }}"
+  loop: "{{ range(0, len_install_dependencies | int)| list }}"
+  loop_control:
+    loop_var: install_dependencies_index
+  when: file_status is succeeded
+
+- name: Get run_command length
+  set_fact: 
+    len_run_command: "{{ sensor_name.value[ansible_host]['run_command']|length }}"
+  ignore_errors: yes 
+
+- name: Create Dockerfile if it doesn't exist - add run command in dockerfile
+  lineinfile:
+    path: "{{ sensor_name.value[ansible_host]['dockerfile_path'] }}"
+    line: "{{ sensor_name.value[ansible_host]['run_command'][run_command_index] }}"
+  loop: "{{ range(0, len_run_command | int)| list }}"
+  loop_control:
+    loop_var: run_command_index
+  when: file_status is succeeded

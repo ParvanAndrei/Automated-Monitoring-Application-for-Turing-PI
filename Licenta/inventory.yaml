@@ -1,0 +1,116 @@
+---
+all:
+  vars:
+    project_name: "LICENTA"
+    token: "wSkarwcxlnr5nkSNPbRuJMvxgz5TrelD3_bcoH0ka82-F2PTa7V2bwQmt5Q6gEmhlAM3W6Of9u14gwcYFp4RYg=="
+    sensors:
+      ccs811:
+        192.168.0.9:
+          number: 1
+          i2c_nec: "yes"
+#--------------------------- PATH -------------------------------------------------
+          sensor_path: "./Licenta/environment/ccs811/"
+          dockerfile_path: "./Licenta/environment/ccs811/Dockerfile"
+#----------------------------------------------------------------------------------
+#-------------------- DOCKERFILE CONTENT ------------------------------------------
+          get_image: "FROM arm32v7/python:3.7-slim-buster"
+          copy_files: ["COPY ccs811.py ./"]
+          install_dependencies: ["RUN apt-get -y update","RUN apt-get -y install i2c-tools", "RUN apt-get -y install build-essential python3-dev","RUN pip3 install influxdb-client","RUN pip3 install RPi.GPIO", "RUN pip3 install adafruit-circuitpython-ccs811"]
+          run_command: ['CMD ["python3", "ccs811.py"]']
+        192.168.0.10:
+          number: 1
+          i2c_nec: "yes"
+#--------------------------- PATH -------------------------------------------------
+          sensor_path: "./Licenta/environment/ccs811/"
+          dockerfile_path: "./Licenta/environment/ccs811/Dockerfile"
+#----------------------------------------------------------------------------------
+#-------------------- DOCKERFILE CONTENT ------------------------------------------
+          get_image: "FROM arm32v7/python:3.7-slim-buster"
+          copy_files: ["COPY ccs811.py ./"]
+          install_dependencies: ["RUN apt-get -y update","RUN apt-get -y install i2c-tools", "RUN apt-get -y install build-essential python3-dev","RUN pip3 install influxdb-client","RUN pip3 install RPi.GPIO", "RUN pip3 install adafruit-circuitpython-ccs811"]
+          run_command: ['CMD ["python3", "ccs811.py"]']
+      dht11: 
+        192.168.0.9:      #acelasi tip de senzor dar pe alta masina
+          number: 1     #cati senzori
+#--------------------------- PATH -------------------------------------------------
+          sensor_path: "./Licenta/environment/dht11/"
+          dockerfile_path: "./Licenta/environment/dht11/Dockerfile"
+#----------------------------------------------------------------------------------
+#-------------------- DOCKERFILE CONTENT ------------------------------------------
+          get_image: "FROM arm32v7/python:3.7-slim-buster"
+          copy_files: ["COPY dht11.py ./"]
+          install_dependencies: ["RUN apt-get -y update", "RUN apt-get -y install build-essential python-dev","RUN pip3 install influxdb-client", "RUN pip3 install Adafruit_DHT"]
+          run_command: ['CMD ["python3", "dht11.py"]']
+        192.168.0.10:      #acelasi tip de senzor dar pe alta masina
+          number: 1     #cati senzori
+#--------------------------- PATH -------------------------------------------------
+          sensor_path: "./Licenta/environment/dht11/"
+          dockerfile_path: "./Licenta/environment/dht11/Dockerfile"
+#----------------------------------------------------------------------------------
+#-------------------- DOCKERFILE CONTENT ------------------------------------------
+          get_image: "FROM arm32v7/python:3.7-slim-buster"
+          copy_files: ["COPY dht11.py ./"]
+          install_dependencies: ["RUN apt-get -y update", "RUN apt-get -y install build-essential python-dev","RUN pip3 install influxdb-client", "RUN pip3 install Adafruit_DHT"]
+          run_command: ['CMD ["python3", "dht11.py"]']
+#----------------------------------------------------------------------------------
+      bme680:
+        127.0.0.1:
+          number: 1
+          i2c_nec: "yes"
+          sensor_path: "./environment/bme680/"
+          dockerfile_path: "./environment/bme680/Dockerfile"
+#----------------------------------------------------------------------------------
+#-------------------- DOCKERFILE CONTENT ------------------------------------------
+          get_image: "FROM arm32v7/python:3.7-slim-buster"
+          copy_files: ["COPY bme680.py ./"]
+          install_dependencies: ["RUN apt-get -y update", "RUN apt-get -y install build-essential python-dev","RUN pip3 install influxdb-client","RUN pip3 install RPi.GPIO","RUN pip3 install influxdb-client", "RUN pip3 install adafruit-circuitpython-bme680"]
+          run_command: ['CMD ["python3", "bme680.py"]']
+#----------------------------------------------------------------------------------
+      led_blinker:
+        127.0.0.1:  
+          number: 1 # number of sensors
+#--------------------------- PATH -------------------------------------------------
+          sensor_path: "./environment/led_blinker/"
+          dockerfile_path: "./environment/led_blinker/Dockerfile"
+#----------------------------------------------------------------------------------
+#-------------------- DOCKERFILE CONTENT ------------------------------------------
+          get_image: "FROM arm32v7/python:3.7-slim-buster"
+          copy_files: ["COPY led_blinker.py ./"]
+          install_dependencies: ["RUN apt-get update", "RUN apt-get -y install gcc mono-mcs", "RUN pip3 install rpi.gpio"]
+          run_command: ['CMD ["python3", "led_blinker.py"]']
+#----------------------------------------------------------------------------------
+          out_pins: [24] 
+        192.168.0.9:
+          number: 1 # number of sensors
+#--------------------------- PATH -------------------------------------------------
+          sensor_path: "./Licenta/environment/led_blinker/"
+          dockerfile_path: "./Licenta/environment/led_blinker/Dockerfile"
+#----------------------------------------------------------------------------------
+#-------------------- DOCKERFILE CONTENT ------------------------------------------
+          get_image: "FROM arm32v7/python:3.7-slim-buster"
+          copy_files: ["COPY led_blinker.py ./"]
+          install_dependencies: ["RUN apt-get update", "RUN apt-get -y install gcc mono-mcs", "RUN pip3 install rpi.gpio"]
+          run_command: ['CMD ["python3", "led_blinker.py"]']
+#----------------------------------------------------------------------------------
+          out_pins: [24] 
+        192.168.0.10:
+          number: 1 # number of sensors
+#--------------------------- PATH -------------------------------------------------
+          sensor_path: "./Licenta/environment/led_blinker/"
+          dockerfile_path: "./Licenta/environment/led_blinker/Dockerfile"
+#----------------------------------------------------------------------------------
+#-------------------- DOCKERFILE CONTENT ------------------------------------------
+          get_image: "FROM arm32v7/python:3.7-slim-buster"
+          copy_files: ["COPY led_blinker.py ./"]
+          install_dependencies: ["RUN apt-get update", "RUN apt-get -y install gcc mono-mcs", "RUN pip3 install rpi.gpio"]
+          run_command: ['CMD ["python3", "led_blinker.py"]']
+#----------------------------------------------------------------------------------
+          out_pins: [24] 
+  hosts:  # aici ai hosturile la care se conecteaza
+    Master: 
+      ansible_connection: local
+      ansible_host: 127.0.0.1 # pentru a rula local
+    Slave1:
+      ansible_host: 192.168.0.9
+    Slave2:
+      ansible_host: 192.168.0.10

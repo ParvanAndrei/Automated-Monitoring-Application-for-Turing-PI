@@ -1,0 +1,7 @@
+---
+- name: Stop existing container with id {{ container_id }}
+  command: docker kill {{ container_id }}
+  ignore_errors: yes
+
+- name: Delete existing container with id {{ container_id }}
+  command: "docker rm {{ container_id }}"

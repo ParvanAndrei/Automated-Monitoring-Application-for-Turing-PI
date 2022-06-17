@@ -1,0 +1,15 @@
+- name: Main Playbook
+  # hosts: localhost # all:!localhost
+  hosts: all # pentru a rula si local
+  # connection: local  
+  gather_facts: no # pentru a rula si local
+  tasks:
+ 
+  # - name: test
+  #   include_tasks: test.yml
+
+  - name: Get senzor list
+    include_tasks: sensor_task.yml
+    loop: "{{ lookup('dict', sensors) }}"
+    loop_control:
+      loop_var: sensor_name

@@ -1,0 +1,14 @@
+---
+- name: Get lenght of pins
+  set_fact: 
+    len_out_pin: "{{ sensor_name.value[ansible_host]['out_pins']|length }}"
+  ignore_errors: yes  
+
+- name: Create docker container
+  command: "docker container run --privileged -d -e test={{ sensor_name.value[ansible_host]['out_pins'][out_pins_index] }} {{ sensor_name.key }}:latest"
+  loop: "{{ range(0, len_out_pin | int)| list }}"
+  loop_control:
+    loop_var: out_pins_index
+  ignore_errors: yes
+
+

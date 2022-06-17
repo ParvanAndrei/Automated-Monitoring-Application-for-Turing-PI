@@ -1,0 +1,5 @@
+---
+- name: Run container for sensors without pins declared
+  command: "docker container run --privileged -d --restart always -e name={{ ansible_host }} \ -e token={{ token }} {{ sensor_name.key }}:latest"
+  loop: "{{ range(0, nr_of_sensors | int )|list }}"
+  register: status

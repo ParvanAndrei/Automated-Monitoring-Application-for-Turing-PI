@@ -1,0 +1,59 @@
+---
+- name: Verify/Install Docker on all machines
+  become: yes
+  block:
+#--------------- CHECK AND INSTALL DOCKER ---------------------------------
+
+#-------------------- CHECK DOCKER ----------------------------------------
+
+  - name: Check if docker exist
+    command: docker --version
+    register: docker_valid
+    ignore_errors: yes
+
+  - name: debug docker output
+    debug: 
+      var: docker_valid
+
+  #----------------- INSTALL DOCKER ---------------------------------------
+  - name: Install Docker - update system
+    apt:
+      update_cache: yes
+    register: update_output
+    when: docker_valid.failed
+  
+  # - name: install Docker - update -output
+  #   debug:
+  #     var: update_output
+
+  - name: Install docker - upgrade system
+    apt:
+      upgrade: yes
+    register: upgrade_output
+    when: docker_valid.failed
+
+  # - name: install docker - upgrade - output
+  #   debug:
+  #     var: upgrade_output
+
+  # - name: install docker - curl
+  #   ansible.builtin.shell: curl -fsSL https://get.docker.com -o get-docker.sh
+  #   args:
+  #     warn: no
+  #   register: curl_output
+  #   when: docker_valid.failed
+
+  # - name: install docker - curl -output
+  #   debug:
+  #     var: curl_output
+
+    # aparent merge cu sudo apt-get install docker.io NU E BUN CRED
+  - name: Install docker 
+    apt:
+      name: docker.io
+    register: sh_output
+    when: docker_valid.failed
+  
+#-------------------------------------------------------------------------------------------------
+
+
